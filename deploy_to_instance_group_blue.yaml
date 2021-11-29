@@ -4,6 +4,7 @@ runAs: root
 env:
   variables:
     version: 0.0.0
+    git_url = "https://github.com/RahulMR42/oci_traffic_shift_demo"
 files:
   # This section is to define how the files in the artifact shall 
   # be put on the compute instance
@@ -12,10 +13,17 @@ files:
 steps:
   # This section is to define the scripts that each step shall run on the instance after file copy.
   - stepType: Command
-    name: Install httpd
+    name: Clone from GIT 
     command: |
-      dnf install httpd
-      systemctl enable --now httpd.service      
-      systemctl status httpd
+      git clone ${git_url} /app
     runAs: root
     timeoutInSeconds: 600
+
+  - stepType: Command
+    name: Start the app 
+    command: |
+      pip install -r requirements.txt
+      uvicorn main:app --port 80
+    runAs: root
+    timeoutInSeconds: 600
+  
